@@ -19,6 +19,7 @@ const BookingTable = ({ bookings, setBookings }) => {
   const [filterDate, setFilterDate] = useState(getTodayDate());
   const [showAll, setShowAll] = useState(false);
   const [paymentAmounts, setPaymentAmounts] = useState({});
+  const [searchLastName, setSearchLastName] = useState(''); // Фільтр за прізвищем
 
   // Завантажуємо ціни з налаштувань
   useEffect(() => {
@@ -130,9 +131,16 @@ const BookingTable = ({ bookings, setBookings }) => {
     }
   }, [editedBooking.duration, editedBooking.seats]);
 
+  // Фільтруємо записи за обраною датою або показуємо всі
   const filteredBookings = showAll ? bookings : bookings.filter((booking) => booking.date === filterDate);
 
-  const sortedBookings = filteredBookings.sort((a, b) => {
+  // Фільтруємо за прізвищем
+  const searchedBookings = filteredBookings.filter((booking) =>
+    booking.lastName.toLowerCase().includes(searchLastName.toLowerCase())
+  );
+
+  // Логіка сортування за датою та часом
+  const sortedBookings = searchedBookings.sort((a, b) => {
     const dateA = new Date(`${a.date}T${a.time}`);
     const dateB = new Date(`${b.date}T${b.time}`);
     return dateA - dateB;
@@ -140,6 +148,7 @@ const BookingTable = ({ bookings, setBookings }) => {
 
   return (
     <div>
+      {/* Блок фільтрів */}
       <div className="filters">
         <label>Дата: </label>
         <input
@@ -151,8 +160,17 @@ const BookingTable = ({ bookings, setBookings }) => {
           }}
         />
         <button onClick={() => setShowAll(true)}>Показати всі</button>
+        
+        <label>Пошук за прізвищем: </label>
+        <input
+          type="text"
+          value={searchLastName}
+          onChange={(e) => setSearchLastName(e.target.value)}
+          placeholder="Введіть прізвище"
+        />
       </div>
 
+      {/* Таблиця бронювань */}
       <table className="booking-table">
         <thead>
           <tr>
@@ -189,23 +207,10 @@ const BookingTable = ({ bookings, setBookings }) => {
               <td>{editingBookingId === booking._id ? <input type="number" name="seats" value={editedBooking.seats || ''} onChange={handleChange} /> : booking.seats}</td>
               <td>{editingBookingId === booking._id ? editedBooking.totalPrice : booking.totalPrice}</td>
               <td>{booking.paid}</td>
-              <td
-                style={{
-                  backgroundColor: booking.remaining === 0 ? 'green' : 'transparent',
-                  color: booking.remaining === 0 ? 'white' : 'black',
-                }}
-              >
-                {booking.remaining}
-              </td>
+              <td style={{ backgroundColor: booking.remaining === 0 ? 'green' : 'transparent', color: booking.remaining === 0 ? 'white' : 'black' }}>{booking.remaining}</td>
               <td>
-                <input
-                  type="number"
-                  value={paymentAmounts[booking._id] || ''}
-                  onChange={(e) => handlePaymentChange(e, booking._id)}
-                  placeholder="Сума оплати"
-                  style={{ color: paymentAmounts[booking._id] > booking.remaining ? 'red' : 'black' }}
-                />
-                <button onClick={() => handleAddPayment(booking)} disabled={paymentAmounts[booking._id] > booking.remaining}>Сплатити</button>
+                <input type="number" value={paymentAmounts[booking._id] || ''} onChange={(e) => handlePaymentChange(e, booking._id)} placeholder="Сума оплати" />
+                <button onClick={() => handleAddPayment(booking)}>Сплатити</button>
               </td>
               <td>
                 {editingBookingId === booking._id ? (
