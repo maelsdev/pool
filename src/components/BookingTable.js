@@ -3,7 +3,6 @@ import './BookingTable.css';
 import axios from 'axios';
 
 const BookingTable = ({ bookings, setBookings }) => {
-  // Отримати поточну дату у форматі YYYY-MM-DD
   const getTodayDate = () => {
     const today = new Date();
     const year = today.getFullYear();
@@ -21,7 +20,6 @@ const BookingTable = ({ bookings, setBookings }) => {
   const [paymentAmounts, setPaymentAmounts] = useState({});
   const [searchLastName, setSearchLastName] = useState(''); // Фільтр за прізвищем
 
-  // Завантажуємо ціни з налаштувань
   useEffect(() => {
     axios.get('http://localhost:5001/api/settings')
       .then(response => {
@@ -114,7 +112,6 @@ const BookingTable = ({ bookings, setBookings }) => {
     }
   };
 
-  // Функція для обчислення загальної вартості
   const calculateTotalPrice = (duration, seats) => {
     const price = duration === '1' ? pricePerHour : priceForTwoHours;
     return price * seats;
@@ -131,24 +128,72 @@ const BookingTable = ({ bookings, setBookings }) => {
     }
   }, [editedBooking.duration, editedBooking.seats]);
 
-  // Фільтруємо записи за обраною датою або показуємо всі
   const filteredBookings = showAll ? bookings : bookings.filter((booking) => booking.date === filterDate);
 
-  // Фільтруємо за прізвищем
   const searchedBookings = filteredBookings.filter((booking) =>
     booking.lastName.toLowerCase().includes(searchLastName.toLowerCase())
   );
 
-  // Логіка сортування за датою та часом
   const sortedBookings = searchedBookings.sort((a, b) => {
     const dateA = new Date(`${a.date}T${a.time}`);
     const dateB = new Date(`${b.date}T${b.time}`);
     return dateA - dateB;
   });
 
+  // Функція для друку таблиці
+  const handlePrint = () => {
+    const printWindow = window.open('', '_blank');
+    const tableHtml = `
+      <html>
+      <head><title>Друк бронювань</title></head>
+      <body>
+        <h1>Таблиця бронювань</h1>
+        <table border="1" cellpadding="10" cellspacing="0">
+          <thead>
+            <tr>
+              <th>Прізвище</th>
+              <th>Ім'я</th>
+              <th>Телефон</th>
+              <th>Дата</th>
+              <th>Час</th>
+              <th>Тривалість</th>
+              <th>Кількість місць</th>
+              <th>Загальна вартість</th>
+              <th>Сплачено</th>
+              <th>Залишок</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${sortedBookings
+              .map(
+                (booking) => `
+                  <tr>
+                    <td>${booking.lastName}</td>
+                    <td>${booking.firstName}</td>
+                    <td>${booking.phone}</td>
+                    <td>${booking.date}</td>
+                    <td>${booking.time}</td>
+                    <td>${booking.duration === '1' ? '1 година' : '2 години'}</td>
+                    <td>${booking.seats}</td>
+                    <td>${booking.totalPrice}</td>
+                    <td>${booking.paid}</td>
+                    <td>${booking.remaining}</td>
+                  </tr>
+                `
+              )
+              .join('')}
+          </tbody>
+        </table>
+      </body>
+      </html>
+    `;
+    printWindow.document.write(tableHtml);
+    printWindow.document.close();
+    printWindow.print();
+  };
+
   return (
     <div>
-      {/* Блок фільтрів */}
       <div className="filters">
         <label>Дата: </label>
         <input
@@ -160,7 +205,6 @@ const BookingTable = ({ bookings, setBookings }) => {
           }}
         />
         <button onClick={() => setShowAll(true)}>Показати всі</button>
-        
         <label>Пошук за прізвищем: </label>
         <input
           type="text"
@@ -168,9 +212,9 @@ const BookingTable = ({ bookings, setBookings }) => {
           onChange={(e) => setSearchLastName(e.target.value)}
           placeholder="Введіть прізвище"
         />
+        <button onClick={handlePrint}>Роздрукувати</button>
       </div>
 
-      {/* Таблиця бронювань */}
       <table className="booking-table">
         <thead>
           <tr>
