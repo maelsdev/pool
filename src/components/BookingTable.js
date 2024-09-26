@@ -5,7 +5,7 @@ import axios from 'axios';
 const BookingTable = ({ bookings, setBookings }) => {
   const [editingBookingId, setEditingBookingId] = useState(null);
   const [editedBooking, setEditedBooking] = useState({});
-  const [paymentAmount, setPaymentAmount] = useState(0); // Поле для введення суми оплати
+  const [paymentAmounts, setPaymentAmounts] = useState({}); // Динамічні суми для кожного рядка
   const [pricePerHour, setPricePerHour] = useState(100); // Ціна за годину
   const [priceForTwoHours, setPriceForTwoHours] = useState(180); // Ціна за дві години
 
@@ -35,7 +35,8 @@ const BookingTable = ({ bookings, setBookings }) => {
       const updatedTotalPrice = calculateTotalPrice(editedBooking.duration, editedBooking.seats);
       const updatedBooking = {
         ...editedBooking,
-        totalPrice: updatedTotalPrice
+        totalPrice: updatedTotalPrice,
+        remaining: updatedTotalPrice - editedBooking.paid // Оновлюємо залишок
       };
 
       const response = await axios.put(`http://localhost:5001/api/bookings/${id}`, updatedBooking);
@@ -81,9 +82,46 @@ const BookingTable = ({ bookings, setBookings }) => {
       setEditedBooking((prevBooking) => ({
         ...prevBooking,
         totalPrice: updatedTotalPrice,
+        remaining: updatedTotalPrice - prevBooking.paid, // Оновлюємо залишок динамічно
       }));
     }
   }, [editedBooking.duration, editedBooking.seats]);
+
+  // Оновлення суми для оплати для конкретного рядка
+  const handlePaymentChange = (e, bookingId) => {
+    const value = e.target.value;
+    setPaymentAmounts((prev) => ({
+      ...prev,
+      [bookingId]: value, // Оновлюємо суму оплати лише для конкретного бронювання
+    }));
+  };
+
+  const handleAddPayment = async (booking) => {
+    const paymentValue = parseFloat(paymentAmounts[booking._id] || 0);
+    if (paymentValue > booking.remaining) {
+      // Якщо введена сума більша за залишок, нічого не робимо
+      return;
+    }
+
+    const updatedBooking = {
+      ...booking,
+      paid: booking.paid + paymentValue,
+      remaining: booking.remaining - paymentValue,
+    };
+
+    try {
+      const response = await axios.put(`http://localhost:5001/api/bookings/${booking._id}`, updatedBooking);
+      setBookings((prevBookings) =>
+        prevBookings.map((b) => (b._id === booking._id ? response.data : b))
+      );
+      setPaymentAmounts((prev) => ({
+        ...prev,
+        [booking._id]: '', // Очищення поля після сплати для конкретного бронювання
+      }));
+    } catch (err) {
+      console.error('Помилка оновлення бронювання після оплати:', err);
+    }
+  };
 
   // Логіка сортування за датою та часом
   const sortedBookings = bookings.sort((a, b) => {
@@ -91,28 +129,6 @@ const BookingTable = ({ bookings, setBookings }) => {
     const dateB = new Date(`${b.date}T${b.time}`);
     return dateA - dateB; // Сортуємо від меншого до більшого
   });
-
-  // Функція для обробки платежу
-  const handlePaymentChange = (e) => {
-    setPaymentAmount(Number(e.target.value)); // Оновлюємо введену суму оплати
-  };
-
-  const handleAddPayment = async (booking) => {
-    const updatedBooking = {
-      ...booking,
-      paid: booking.paid + paymentAmount, // Оновлюємо сплачено
-      remaining: booking.totalPrice - (booking.paid + paymentAmount), // Оновлюємо залишок
-    };
-    try {
-      const response = await axios.put(`http://localhost:5001/api/bookings/${booking._id}`, updatedBooking);
-      setBookings((prevBookings) =>
-        prevBookings.map((b) => (b._id === booking._id ? response.data : b))
-      );
-      setPaymentAmount(0); // Очищуємо поле після оплати
-    } catch (err) {
-      console.error('Помилка оновлення бронювання після оплати:', err);
-    }
-  };
 
   return (
     <table className="booking-table">
@@ -197,7 +213,11 @@ const BookingTable = ({ bookings, setBookings }) => {
             </td>
             <td>
               {editingBookingId === booking._id ? (
-                <select name="duration" value={editedBooking.duration || '1'} onChange={handleChange}>
+                <select
+                  name="duration"
+                  value={editedBooking.duration || ''}
+                  onChange={handleChange}
+                >
                   <option value="1">1 година</option>
                   <option value="2">2 години</option>
                 </select>
@@ -217,15 +237,23 @@ const BookingTable = ({ bookings, setBookings }) => {
             </td>
             <td>{editingBookingId === booking._id ? editedBooking.totalPrice : booking.totalPrice}</td>
             <td>{booking.paid}</td>
-            <td>{booking.remaining}</td>
+            <td style={{ color: booking.remaining < 0 ? 'red' : 'black' }}>
+              {booking.remaining}
+            </td>
             <td>
               <input
                 type="number"
-                value={paymentAmount}
-                onChange={handlePaymentChange}
+                value={paymentAmounts[booking._id] || ''} // Окреме поле для кожного рядка
+                onChange={(e) => handlePaymentChange(e, booking._id)}
                 placeholder="Сума оплати"
+                style={{ color: parseFloat(paymentAmounts[booking._id] || 0) > booking.remaining ? 'red' : 'black' }}
               />
-              <button onClick={() => handleAddPayment(booking)}>Сплатити</button>
+              <button
+                onClick={() => handleAddPayment(booking)}
+                disabled={parseFloat(paymentAmounts[booking._id] || 0) > booking.remaining}
+              >
+                Сплатити
+              </button>
             </td>
             <td>
               {editingBookingId === booking._id ? (
