@@ -1,0 +1,67 @@
+.booking-page {
+  margin: 20px auto;
+  padding: 20px;
+  min-width: 600px; /* Обмежуємо ширину форми */
+  background-color: #f9f9f9; /* Світлий фон для форми */
+  border-radius: 10px; /* Заокруглюємо краї форми */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Легка тінь для форми */
+}
+
+.booking-page h1 {
+  text-align: left;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.booking-page form {
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+.booking-page form div {
+  margin-bottom: 15px; /* Відступи між елементами форми */
+}
+
+.booking-page label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+  font-size: 14px;
+}
+
+.booking-page input,
+.booking-page select {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+.booking-page input:focus,
+.booking-page select:focus {
+  border-color: #007bff; /* Синій колір при фокусі */
+  outline: none;
+}
+
+.booking-page button {
+  padding: 12px;
+  background-color: #007bff; /* Синя кнопка */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.booking-page button:hover {
+  background-color: #0056b3; /* Темніший синій при наведенні */
+}
+
+.booking-page button:active {
+  background-color: #004085; /* Ще темніший синій при натисканні */
+}

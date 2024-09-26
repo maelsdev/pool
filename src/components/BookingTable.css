@@ -1,0 +1,38 @@
+.booking-table-container {
+  padding: 20px;
+}
+
+.booking-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+.booking-table th, .booking-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.booking-table th {
+  background-color: #f2f2f2;
+}
+
+.booking-table th button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding-left: 10px;
+}
+
+.booking-table th button:hover {
+  color: #007bff;
+}
+
+.booking-table td {
+  font-size: 14px;
+}
+
+.booking-table tbody tr:hover {
+  background-color: #f9f9f9;
+}
