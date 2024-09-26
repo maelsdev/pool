@@ -5,9 +5,18 @@ import axios from 'axios';
 const BookingTable = ({ bookings, setBookings }) => {
   const [editingBookingId, setEditingBookingId] = useState(null);
   const [editedBooking, setEditedBooking] = useState({});
-  const [paymentAmounts, setPaymentAmounts] = useState({}); // Динамічні суми для кожного рядка
   const [pricePerHour, setPricePerHour] = useState(100); // Ціна за годину
   const [priceForTwoHours, setPriceForTwoHours] = useState(180); // Ціна за дві години
+  const [paymentAmounts, setPaymentAmounts] = useState({});
+
+  // Отримати поточну дату у форматі YYYY-MM-DD
+  const getTodayDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
   // Завантажуємо ціни з налаштувань
   useEffect(() => {
@@ -87,7 +96,6 @@ const BookingTable = ({ bookings, setBookings }) => {
     }
   }, [editedBooking.duration, editedBooking.seats]);
 
-  // Оновлення суми для оплати для конкретного рядка
   const handlePaymentChange = (e, bookingId) => {
     const value = e.target.value;
     setPaymentAmounts((prev) => ({
@@ -99,7 +107,6 @@ const BookingTable = ({ bookings, setBookings }) => {
   const handleAddPayment = async (booking) => {
     const paymentValue = parseFloat(paymentAmounts[booking._id] || 0);
     if (paymentValue > booking.remaining) {
-      // Якщо введена сума більша за залишок, нічого не робимо
       return;
     }
 
@@ -123,8 +130,12 @@ const BookingTable = ({ bookings, setBookings }) => {
     }
   };
 
+  // Фільтруємо бронювання за сьогоднішньою датою
+  const todayDate = getTodayDate();
+  const filteredBookings = bookings.filter((booking) => booking.date === todayDate);
+
   // Логіка сортування за датою та часом
-  const sortedBookings = bookings.sort((a, b) => {
+  const sortedBookings = filteredBookings.sort((a, b) => {
     const dateA = new Date(`${a.date}T${a.time}`);
     const dateB = new Date(`${b.date}T${b.time}`);
     return dateA - dateB; // Сортуємо від меншого до більшого
@@ -211,18 +222,7 @@ const BookingTable = ({ bookings, setBookings }) => {
                 booking.time
               )}
             </td>
-            <td>
-              {editingBookingId === booking._id ? (
-                <select
-                  name="duration"
-                  value={editedBooking.duration || ''}
-                  onChange={handleChange}
-                >
-                  <option value="1">1 година</option>
-                  <option value="2">2 години</option>
-                </select>
-              ) : booking.duration === '1' ? '1 година' : '2 години'}
-            </td>
+            <td>{booking.duration === '1' ? '1 година' : '2 години'}</td>
             <td>
               {editingBookingId === booking._id ? (
                 <input
@@ -237,20 +237,27 @@ const BookingTable = ({ bookings, setBookings }) => {
             </td>
             <td>{editingBookingId === booking._id ? editedBooking.totalPrice : booking.totalPrice}</td>
             <td>{booking.paid}</td>
-            <td style={{ color: booking.remaining < 0 ? 'red' : 'black' }}>
+            <td
+              style={{
+                backgroundColor: booking.remaining === 0 ? 'green' : 'transparent',
+                color: booking.remaining === 0 ? 'white' : 'black',
+              }}
+            >
               {booking.remaining}
             </td>
             <td>
               <input
                 type="number"
-                value={paymentAmounts[booking._id] || ''} // Окреме поле для кожного рядка
+                value={paymentAmounts[booking._id] || ''}
                 onChange={(e) => handlePaymentChange(e, booking._id)}
                 placeholder="Сума оплати"
-                style={{ color: parseFloat(paymentAmounts[booking._id] || 0) > booking.remaining ? 'red' : 'black' }}
+                style={{
+                  color: parseFloat(paymentAmounts[booking._id] || 0) > booking.remaining ? 'red' : 'black',
+                }}
               />
               <button
                 onClick={() => handleAddPayment(booking)}
-                disabled={parseFloat(paymentAmounts[booking._id] || 0) > booking.remaining}
+                disabled={parseFloat(paymentAmounts[booking._id] || 0) > booking.remaining} // Деактивація кнопки, якщо сума більша за залишок
               >
                 Сплатити
               </button>
