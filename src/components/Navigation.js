@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const Navigation = () => {
+const Navigation = ({ onLogout }) => { // Додаємо пропс onLogout
   return (
     <nav>
       <ul>
@@ -10,6 +10,9 @@ const Navigation = () => {
         </li>
         <li>
           <Link to="/settings">Налаштування</Link>
+        </li>
+        <li>
+          <button onClick={onLogout}>Вийти</button> {/* Кнопка для виходу */}
         </li>
       </ul>
     </nav>

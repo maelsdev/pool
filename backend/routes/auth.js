@@ -1,31 +1,58 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const router = express.Router();
+const User = require('../models/User'); // Підключаємо модель користувача для MongoDB
 
-// Отримуємо логін і пароль з .env файлу
-const adminEmail = process.env.ADMIN_EMAIL;
-const adminPassword = process.env.ADMIN_PASSWORD;
-const jwtSecret = process.env.JWT_SECRET;
+// Маршрут для реєстрації користувачів
+router.post('/register', async (req, res) => {
+    const { username, password } = req.body;
 
-// Логін (POST)
+    try {
+        // Перевіряємо, чи існує вже користувач з таким логіном
+        const existingUser = await User.findOne({ username });
+        if (existingUser) {
+            return res.status(400).json({ message: 'Користувач з таким логіном вже існує' });
+        }
+
+        // Хешуємо пароль перед збереженням
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Створюємо нового користувача з хешованим паролем
+        const newUser = new User({ username, password: hashedPassword });
+        await newUser.save();
+
+        res.status(201).json({ message: 'Користувача створено успішно' });
+    } catch (error) {
+        res.status(500).json({ message: 'Помилка при створенні користувача' });
+    }
+});
+
+// Маршрут для логіну користувачів
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-  
-  // Перевірка email
-  if (email !== adminEmail) {
-    return res.status(401).json({ message: 'Невірний email' });
-  }
+    const { username, password } = req.body;
 
-  // Перевірка пароля
-  if (password !== adminPassword) {
-    return res.status(401).json({ message: 'Невірний пароль' });
-  }
+    try {
+        // Знаходимо користувача за логіном (username)
+        const user = await User.findOne({ username });
+        if (!user) {
+            return res.status(401).json({ message: 'Невірний логін або пароль' });
+        }
 
-  // Генерація JWT токена
-  const token = jwt.sign({ email }, jwtSecret, { expiresIn: '1h' });
+        // Перевіряємо пароль за допомогою bcrypt
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        
+        // Додай відладкове повідомлення для перевірки
+        console.log('Password is valid:', isPasswordValid);
+        
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: 'Невірний логін або пароль' });
+        }
 
-  res.status(200).json({ token });
+        // Якщо все ок, відправляємо позитивну відповідь
+        res.status(200).json({ message: 'Успішний вхід' });
+    } catch (error) {
+        res.status(500).json({ message: 'Помилка сервера' });
+    }
 });
 
 module.exports = router;
