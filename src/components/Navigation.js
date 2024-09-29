@@ -1,7 +1,8 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
 
-const Navigation = ({ onLogout }) => { // Додаємо пропс onLogout
+const Navigation = ({ onLogout }) => {
+  // Додаємо пропс onLogout
   return (
     <nav>
       <ul>
@@ -10,6 +11,10 @@ const Navigation = ({ onLogout }) => { // Додаємо пропс onLogout
         </li>
         <li>
           <Link to="/settings">Налаштування</Link>
+        </li>
+        <li>
+          <Link to="/users">Користувачі</Link>{" "}
+          {/* Додаємо посилання на сторінку користувачів */}
         </li>
         <li>
           <button onClick={onLogout}>Вийти</button> {/* Кнопка для виходу */}

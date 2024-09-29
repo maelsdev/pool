@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'; // Додаємо useCallback
 import './BookingTable.css';
 import axios from 'axios';
 
 const BookingTable = ({ bookings, setBookings }) => {
+  // Отримати поточну дату у форматі YYYY-MM-DD
   const getTodayDate = () => {
     const today = new Date();
     const year = today.getFullYear();
@@ -20,6 +21,12 @@ const BookingTable = ({ bookings, setBookings }) => {
   const [paymentAmounts, setPaymentAmounts] = useState({});
   const [searchLastName, setSearchLastName] = useState(''); // Фільтр за прізвищем
 
+  // Використовуємо useCallback для мемоізації calculateTotalPrice
+  const calculateTotalPrice = useCallback((duration, seats) => {
+    const price = duration === '1' ? pricePerHour : priceForTwoHours;
+    return price * seats;
+  }, [pricePerHour, priceForTwoHours]);
+
   useEffect(() => {
     axios.get('http://localhost:5001/api/settings')
       .then(response => {
@@ -28,7 +35,7 @@ const BookingTable = ({ bookings, setBookings }) => {
         setPriceForTwoHours(settings.priceForTwoHours);
       })
       .catch(err => console.error('Помилка завантаження налаштувань:', err));
-  }, []);
+  }, []); // Залишаємо порожній масив, щоб отримати налаштування один раз
 
   const handleEdit = (booking) => {
     setEditingBookingId(booking._id);
@@ -112,11 +119,6 @@ const BookingTable = ({ bookings, setBookings }) => {
     }
   };
 
-  const calculateTotalPrice = (duration, seats) => {
-    const price = duration === '1' ? pricePerHour : priceForTwoHours;
-    return price * seats;
-  };
-
   useEffect(() => {
     if (editingBookingId) {
       const updatedTotalPrice = calculateTotalPrice(editedBooking.duration, editedBooking.seats);
@@ -126,7 +128,7 @@ const BookingTable = ({ bookings, setBookings }) => {
         remaining: updatedTotalPrice - prevBooking.paid,
       }));
     }
-  }, [editedBooking.duration, editedBooking.seats]);
+  }, [editedBooking.duration, editedBooking.seats, calculateTotalPrice, editingBookingId]); // Додаємо editingBookingId
 
   const filteredBookings = showAll ? bookings : bookings.filter((booking) => booking.date === filterDate);
 

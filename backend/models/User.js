@@ -17,8 +17,10 @@ userSchema.pre('save', async function (next) {
     try {
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(user.password, salt);
+        console.log(`Пароль для користувача ${user.username} хешовано`); // Логування
         next();
     } catch (err) {
+        console.error('Помилка при хешуванні пароля:', err); // Логування помилки
         next(err);
     }
 });

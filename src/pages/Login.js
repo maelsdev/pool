@@ -10,6 +10,8 @@ const Login = ({ onLogin }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
+        console.log('Намагаємося увійти з:', { username, password }); // Логування введених даних
+
         fetch('http://localhost:5001/api/auth/login', {
             method: 'POST',
             headers: {
@@ -18,6 +20,8 @@ const Login = ({ onLogin }) => {
             body: JSON.stringify({ username, password }),
         })
         .then((response) => {
+            console.log('Статус відповіді:', response.status); // Логування статусу відповіді
+
             if (response.ok) {
                 onLogin(); // Викликаємо функцію при успішному вході
                 navigate('/'); // Перенаправляємо на сторінку бронювання

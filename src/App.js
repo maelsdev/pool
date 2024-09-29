@@ -6,14 +6,13 @@ import Navigation from './components/Navigation'; // Імпортуємо нав
 import BookingPage from './pages/BookingPage'; // Імпортуємо сторінку бронювання
 import SettingsPage from './pages/SettingsPage'; // Імпортуємо сторінку налаштувань
 import Login from './pages/Login'; // Імпортуємо сторінку авторизації
+import UserManagement from './pages/UserManagement'; // Імпортуємо сторінку користувачів
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false); // Стан для авторизації
 
     useEffect(() => {
-        console.log('Checking authentication...');
         const storedAuth = Cookies.get('isAuthenticated'); // Отримуємо кукіс
-
         console.log('Stored Auth:', storedAuth); // Лог для перевірки
 
         // Перевіряємо, чи користувач авторизований
@@ -46,6 +45,7 @@ function App() {
                     <Route path="/" element={isAuthenticated ? <BookingPage /> : <Navigate to="/login" />} />
                     <Route path="/settings" element={isAuthenticated ? <SettingsPage /> : <Navigate to="/login" />} />
                     <Route path="/login" element={isAuthenticated ? <Navigate to="/" /> : <Login onLogin={handleLogin} />} /> {/* Перенаправляємо, якщо авторизований */}
+                    <Route path="/users" element={isAuthenticated ? <UserManagement /> : <Navigate to="/login" />} /> {/* Новий маршрут */}
                     <Route path="*" element={<Navigate to={isAuthenticated ? "/" : "/login"} />} /> {/* Перенаправлення для невідомих маршрутів */}
                 </Routes>
             </div>
