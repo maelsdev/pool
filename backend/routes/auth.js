@@ -46,6 +46,7 @@ router.post('/register', async (req, res) => {
 
         // Хешуємо пароль перед збереженням
         const hashedPassword = await bcrypt.hash(password, 10);
+        
         console.log(`Хешований пароль для користувача ${username}:`, hashedPassword); // Логування
 
         // Створюємо нового користувача з хешованим паролем
@@ -65,30 +66,32 @@ router.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
   try {
-      // Знаходимо користувача за логіном (username)
       const user = await User.findOne({ username });
       if (!user) {
-          console.log(`Користувача ${username} не знайдено`); // Логування
+          console.log(`Користувача ${username} не знайдено`);
           return res.status(401).json({ message: 'Невірний логін або пароль' });
       }
 
-      // Логування для перевірки
-      console.log('Збережений хеш пароля:', user.password); // Логування
-      console.log('Введений пароль:', password); // Логування введеного пароля
+      console.log('Збережений хеш пароля:', user.password);
+      console.log('Введений пароль:', password);
+
+      
 
       // Перевіряємо пароль за допомогою bcrypt
       const isPasswordValid = await bcrypt.compare(password, user.password);
-      console.log('Пароль є дійсним:', isPasswordValid); // Логування
+      
+      
+      console.log('Пароль є дійсним:', isPasswordValid);
 
       if (!isPasswordValid) {
-          console.log(`Невірний пароль для користувача ${username}`); // Логування
+          console.log(`Невірний пароль для користувача ${username}`);
           return res.status(401).json({ message: 'Невірний логін або пароль' });
       }
 
-      console.log(`Користувача ${username} успішно авторизовано`); // Логування
+      console.log(`Користувача ${username} успішно авторизовано`);
       res.status(200).json({ message: 'Успішний вхід' });
   } catch (error) {
-      console.error('Помилка сервера:', error); // Логування помилки
+      console.error('Помилка сервера:', error);
       res.status(500).json({ message: 'Помилка сервера' });
   }
 });
