@@ -7,7 +7,7 @@ const app = express();
 
 // Налаштування CORS
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: process.env.NODE_ENV === 'production' ? process.env.CLIENT_ORIGIN : 'http://localhost:3000',
   methods: ['GET', 'POST', 'DELETE', 'PUT'],
   credentials: true,
 }));
