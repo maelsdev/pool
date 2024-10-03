@@ -12,7 +12,7 @@ const Login = ({ onLogin }) => {
 
         console.log('Намагаємося увійти з:', { username, password }); // Логування введених даних
 
-        fetch('http://localhost:5001/api/auth/login', {
+        fetch('https://pool-2da3e3f8acbe.herokuapp.com/api/auth/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
