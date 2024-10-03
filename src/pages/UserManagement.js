@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_URL from '../config';
 
 const UserManagement = () => {
     const [users, setUsers] = useState([]);
@@ -10,7 +11,7 @@ const UserManagement = () => {
         // Завантажити користувачів з сервера
         const fetchUsers = async () => {
             try {
-                const response = await fetch('https://pool-2da3e3f8acbe.herokuapp.com/api/auth/users');
+                const response = await fetch(`${API_URL}/api/auth/users`);
                 if (!response.ok) {
                     throw new Error('Не вдалося отримати користувачів');
                 }
@@ -30,7 +31,7 @@ const UserManagement = () => {
         const newUser = { username, password };
 
         try {
-            const response = await fetch('http://localhost:5001/api/auth/register', {
+            const response = await fetch(`${API_URL}/api/auth/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -55,7 +56,7 @@ const UserManagement = () => {
 
     const deleteUser = async (usernameToDelete) => {
         try {
-            const response = await fetch(`http://localhost:5001/api/auth/users/${usernameToDelete}`, {
+            const response = await fetch(`${API_URL}/api/auth/users/${usernameToDelete}`, {
                 method: 'DELETE',
             });
 

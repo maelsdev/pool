@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import API_URL from '../config';
 
 const PaymentHistoryPage = () => {
   const [paymentLogs, setPaymentLogs] = useState([]);
 
   useEffect(() => {
-    axios.get('https://pool-2da3e3f8acbe.herokuapp.com/api/payment-logs') // URL до API для отримання історії оплат
-    // axios.get('http://localhost:5001/api/payment-logs') // URL до API для отримання історії оплат
+    axios.get(`${API_URL}/api/payment-logs`) // URL до API для отримання історії оплат
+    
       .then(response => {
         setPaymentLogs(response.data);
       })

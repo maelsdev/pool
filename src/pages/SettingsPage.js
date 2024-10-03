@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './SettingsPage.css'; // Імпортуємо CSS
 import axios from 'axios';
+import API_URL from '../config';
 
 const SettingsPage = () => {
   // Стани для введених цін
@@ -17,7 +18,7 @@ const SettingsPage = () => {
 
   // Завантажуємо поточні ціни з сервера при першому завантаженні сторінки
   useEffect(() => {
-    axios.get('https://pool-2da3e3f8acbe.herokuapp.com/api/settings')
+    axios.get(`${API_URL}/api/settings`)
       .then(response => {
         const settings = response.data;
         setCurrentPricePerHour(settings.pricePerHour);
@@ -36,7 +37,7 @@ const SettingsPage = () => {
       priceForTwoHours: priceForTwoHours || currentPriceForTwoHours
     };
 
-    axios.post('http://localhost:5001/api/settings', updatedPrices)
+    axios.post(`${API_URL}/api/settings`, updatedPrices)
       .then(() => {
         setCurrentPricePerHour(updatedPrices.pricePerHour);
         setCurrentPriceForTwoHours(updatedPrices.priceForTwoHours);

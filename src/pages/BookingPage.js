@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './BookingPage.css';
 import axios from 'axios';
 import BookingTable from '../components/BookingTable';
+import API_URL from '../config';
 
 const BookingPage = () => {
   const getTodayDate = () => {
@@ -27,7 +28,7 @@ const BookingPage = () => {
   const [bookings, setBookings] = useState([]);
 
   useEffect(() => {
-    axios.get('https://pool-2da3e3f8acbe.herokuapp.com/api/settings')
+    axios.get(`${API_URL}/api/settings`)
       .then(response => {
         const settings = response.data;
         setPricePerHour(settings.pricePerHour);
@@ -41,7 +42,7 @@ const BookingPage = () => {
   }, []);
 
   const fetchBookings = () => {
-    axios.get('http://localhost:5001/api/bookings')
+    axios.get(`${API_URL}/api/bookings`)
       .then(response => {
         setBookings(response.data);
       })
@@ -70,7 +71,7 @@ const BookingPage = () => {
       remaining,
     };
 
-    axios.post('http://localhost:5001/api/bookings', bookingData)
+    axios.post(`${API_URL}api/bookings`, bookingData)
       .then(response => {
         setBookings([...bookings, response.data]);
         clearForm();

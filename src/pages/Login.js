@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import API_URL from '../config';
 
 const Login = ({ onLogin }) => {
     const [username, setUsername] = useState('');
@@ -12,7 +13,7 @@ const Login = ({ onLogin }) => {
 
         console.log('Намагаємося увійти з:', { username, password }); // Логування введених даних
 
-        fetch('https://pool-2da3e3f8acbe.herokuapp.com/api/auth/login', {
+        fetch(`${API_URL}/api/auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
