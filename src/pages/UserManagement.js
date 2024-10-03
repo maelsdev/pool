@@ -10,7 +10,7 @@ const UserManagement = () => {
         // Завантажити користувачів з сервера
         const fetchUsers = async () => {
             try {
-                const response = await fetch('http://localhost:5001/api/auth/users');
+                const response = await fetch('https://pool-2da3e3f8acbe.herokuapp.com/api/auth/users');
                 if (!response.ok) {
                     throw new Error('Не вдалося отримати користувачів');
                 }

@@ -27,7 +27,7 @@ const BookingPage = () => {
   const [bookings, setBookings] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:5001/api/settings')
+    axios.get('https://pool-2da3e3f8acbe.herokuapp.com/api/settings')
       .then(response => {
         const settings = response.data;
         setPricePerHour(settings.pricePerHour);
