@@ -7,15 +7,17 @@ require('dotenv').config();
 const app = express();
 
 // Налаштування CORS
-app.use(cors((req, callback) => {
-  const corsOptions = {
-    origin: process.env.NODE_ENV === 'production' ? process.env.CLIENT_ORIGIN : 'http://localhost:3000',
-    methods: ['GET', 'POST', 'DELETE', 'PUT'],
-    credentials: true,
-  };
-  
-  console.log('CORS options:', corsOptions);
-  callback(null, corsOptions);
+app.use(cors({
+  origin: function (origin, callback) {
+    // Дозволити запити з localhost:3000 та Heroku
+    if (origin === 'http://localhost:3000' || origin === 'https://pool-2da3e3f8acbe.herokuapp.com' || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS not allowed'), false);
+    }
+  },
+  methods: ['GET', 'POST', 'DELETE', 'PUT'],
+  credentials: true,
 }));
 
 app.use(express.json()); // Middleware для обробки JSON
