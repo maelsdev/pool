@@ -24,7 +24,7 @@ const SettingsPage = () => {
         setCurrentPricePerHour(settings.pricePerHour);
         setCurrentPriceForTwoHours(settings.priceForTwoHours);
       })
-      .catch(err => console.error('Помилка завантаження налаштувань:', err));
+      .catch(err => console.error('Помилка завантаження налаштувань1:', err));
   }, []);
 
   // Обробник для збереження нових налаштувань
@@ -46,7 +46,7 @@ const SettingsPage = () => {
         setSuccessMessage('Налаштування успішно збережено!'); // Повідомлення про успіх
         setTimeout(() => setSuccessMessage(''), 3000); // Прибираємо повідомлення через 3 секунди
       })
-      .catch(err => console.error('Помилка збереження налаштувань:', err))
+      .catch(err => console.error('Помилка збереження налаштувань2:', err))
       .finally(() => setLoading(false)); // Приховуємо лоадер після завершення запиту
   };
 
