@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'; // Додаємо useCallback
 import './BookingTable.css';
 import axios from 'axios';
+import API_URL from '../config'
 
 const BookingTable = ({ bookings, setBookings }) => {
   // Отримати поточну дату у форматі YYYY-MM-DD
@@ -28,7 +29,7 @@ const BookingTable = ({ bookings, setBookings }) => {
   }, [pricePerHour, priceForTwoHours]);
 
   useEffect(() => {
-    axios.get('http://localhost:5001/api/settings')
+    axios.get(`${API_URL}/api/settings`)
       .then(response => {
         const settings = response.data;
         setPricePerHour(settings.pricePerHour);
@@ -56,7 +57,7 @@ const BookingTable = ({ bookings, setBookings }) => {
         remaining: updatedTotalPrice - editedBooking.paid,
       };
 
-      const response = await axios.put(`http://localhost:5001/api/bookings/${id}`, updatedBooking);
+      const response = await axios.put(`${API_URL}/api/bookings/${id}`, updatedBooking);
       setBookings((prevBookings) =>
         prevBookings.map((booking) =>
           booking._id === id ? response.data : booking
@@ -70,7 +71,7 @@ const BookingTable = ({ bookings, setBookings }) => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5001/api/bookings/${id}`);
+      await axios.delete(`${API_URL}/api/bookings/${id}`);
       setBookings(bookings.filter((booking) => booking._id !== id));
     } catch (err) {
       console.error('Помилка видалення бронювання:', err);
@@ -106,7 +107,7 @@ const BookingTable = ({ bookings, setBookings }) => {
     };
 
     try {
-      const response = await axios.put(`http://localhost:5001/api/bookings/${booking._id}`, updatedBooking);
+      const response = await axios.put(`${API_URL}/api/bookings/${booking._id}`, updatedBooking);
       setBookings((prevBookings) =>
         prevBookings.map((b) => (b._id === booking._id ? response.data : b))
       );
