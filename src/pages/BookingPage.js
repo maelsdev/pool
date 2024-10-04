@@ -71,7 +71,7 @@ const BookingPage = () => {
       remaining,
     };
 
-    axios.post(`${API_URL}api/bookings`, bookingData)
+    axios.post(`${API_URL}/api/bookings`, bookingData)
       .then(response => {
         setBookings([...bookings, response.data]);
         clearForm();
