@@ -9,10 +9,11 @@ const app = express();
 // Налаштування CORS
 app.use(cors((req, callback) => {
   const corsOptions = {
-    origin: process.env.NODE_ENV === 'production' ? process.env.CLIENT_ORIGIN : 'http://localhost:3000',
+    origin: process.env.NODE_ENV === 'production' ? `https://pool-2da3e3f8acbe.herokuapp.com` : 'http://localhost:3000',
     methods: ['GET', 'POST', 'DELETE', 'PUT'],
     credentials: true,
   };
+  console.log(process.env.CLIENT_ORIGIN);
   
   console.log('CORS options:', corsOptions);
   callback(null, corsOptions);
@@ -35,6 +36,7 @@ app.use('/api/bookings', bookingsRouter);
 console.log('Підключено /api/bookings');
 
 const authRouter = require('./routes/auth');
+const { log } = require('console');
 app.use('/api/auth', authRouter);
 console.log('Підключено /api/auth');
 
