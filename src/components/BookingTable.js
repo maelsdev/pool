@@ -118,7 +118,7 @@ const BookingTable = ({ bookings, setBookings }) => {
     } catch (err) {
       console.error('Помилка оновлення бронювання після оплати:', err);
     }
-  };
+  }; 
 
   useEffect(() => {
     if (editingBookingId) {
