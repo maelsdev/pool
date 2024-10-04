@@ -8,14 +8,22 @@ const app = express();
 
 // Налаштування CORS
 app.use(cors((req, callback) => {
+  // Визначення CORS-опцій
   const corsOptions = {
-    origin: process.env.NODE_ENV === 'production' ? `https://pool-2da3e3f8acbe.herokuapp.com` : 'http://localhost:3000',
+    origin: process.env.NODE_ENV === 'production' 
+      ? 'https://pool-2da3e3f8acbe.herokuapp.com' 
+      : 'http://localhost:3000',
     methods: ['GET', 'POST', 'DELETE', 'PUT'],
     credentials: true,
   };
-  console.log(process.env.CLIENT_ORIGIN);
   
+  // Логування значення CLIENT_ORIGIN (для перевірки)
+  console.log('CLIENT_ORIGIN:', process.env.CLIENT_ORIGIN);
+  
+  // Логування CORS опцій
   console.log('CORS options:', corsOptions);
+  
+  // Виклик колбека з опціями
   callback(null, corsOptions);
 }));
 
